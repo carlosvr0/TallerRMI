@@ -113,5 +113,35 @@ public class Servidor extends UnicastRemoteObject implements InterfazBolsaEmpleo
         }
     }
     
+   @Override
+   public synchronized List<Inscripcion> consultarInscripcionesPorOferta (String idOferta) throws RemoteException {
+    List<Inscripcion> inscripciones = new ArrayList<>();
+    try{
+        FileReader lector = new FileReader("Inscripciones.txt");
+        StringBuilder contenido = new StringBuilder();
+        int caracter;
+        while ((caracter = lector.read())!= -1) {
+            contenido.append((char)caracter);
+        }
+        lector.close();
 
+        String[] bloques = contenido.toString().split(System.lineSeparator() + System.lineSeparator());
+        for(String bloque : bloques){
+            String[] partes = bloque.split("\n");
+            if(partes.length >=3){
+                String nombre = partes[0].split(": ")[1];
+                String cedula = partes[1].split(": ")[1];
+                String id = partes[2].split(": ")[1];
+
+                if(id.equals(idOferta)){
+                    Inscripcion i= new Inscripcion(id, nombre, cedula);
+                    inscripciones.add(i);
+                }
+            }
+        }
+    } catch (IOException e){
+        e.printStackTrace();
+    }
+    return inscripciones;
+   }
 }
